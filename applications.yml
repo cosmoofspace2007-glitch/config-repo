@@ -11,3 +11,5 @@ spring:
         git:
           uri: https://github.com/cosmoofspace2007/config-repo
           default-label: main
+pharmacy:
+  vat-rate: 10
