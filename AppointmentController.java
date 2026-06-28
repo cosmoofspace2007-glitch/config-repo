@@ -1,6 +1,7 @@
 package m3.appointmentservice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -10,10 +11,10 @@ public class AppointmentController {
     @Autowired
     private AppointmentService appointmentService;
 
-    @GetMapping("/check/{doctorId}")
-    public Object checkDoctor(@PathVariable Long doctorId){
+    @GetMapping("/patient/{id}")
+    public ResponseEntity<?> getPatient(@PathVariable Long id){
 
-        return appointmentService.checkDoctor(doctorId);
+        return appointmentService.checkPatient(id);
 
     }
 

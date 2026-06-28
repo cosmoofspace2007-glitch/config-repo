@@ -5,27 +5,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import io.github.resilience4j.retry.annotation.Retry;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
 @Service
 public class AppointmentService {
 
     @Autowired
-    private DoctorClient doctorClient;
+    private PatientClient patientClient;
 
-    @CircuitBreaker(
-            name = "doctorServiceCB",
-            fallbackMethod = "getDoctorFallback"
+    @Retry(
+            name = "patientRetry",
+            fallbackMethod = "getPatientFallback"
     )
-    public Object checkDoctor(Long doctorId) {
+    public ResponseEntity<?> checkPatient(Long patientId){
 
-        return doctorClient.getDoctor(doctorId);
+        return ResponseEntity.ok(patientClient.getPatient(patientId));
 
     }
-    public ApiResponseError getDoctorFallback(Long doctorId, Exception e) {
 
-        return new ApiResponseError(
-                HttpStatus.SERVICE_UNAVAILABLE.value(),
-                "Hiện tại không thể kiểm tra thông tin bác sĩ, vui lòng thử lại sau vài giây."
+    /**
+     * Fallback sau khi Retry thất bại
+     */
+    public ResponseEntity<ApiResponseError> getPatientFallback(Long patientId, Exception e){
+
+        ApiResponseError error = new ApiResponseError(
+                503,
+                "Không thể lấy thông tin bệnh nhân. Vui lòng thử lại sau."
         );
+
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(error);
 
     }
 
